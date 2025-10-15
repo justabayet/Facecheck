@@ -1,10 +1,12 @@
 import * as faceapi from 'face-api.js';
 import { useEffect, useRef, useState } from 'react';
+import FeatherIcon from "feather-icons-react";
 
 function App() {
-
   const [modelsLoaded, setModelsLoaded] = useState(false);
   const [captureVideo, setCaptureVideo] = useState(false);
+  const [hasCameraData, setHasCaptureData] = useState(false);
+  const [isHappy, setIsHappy] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const videoHeight = 480;
@@ -48,6 +50,7 @@ function App() {
 
       videoRef.current.addEventListener('loadeddata', () => {
         if (canvasRef.current && videoRef.current) {
+          setHasCaptureData(true)
           const newCanvas = faceapi.createCanvasFromMedia(videoRef.current);
           canvasRef.current.innerHTML = ''; // clear existing content if needed
           canvasRef.current.appendChild(newCanvas); // ✅ append the face-api canvas
@@ -61,7 +64,13 @@ function App() {
 
           const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
 
-          console.log(detections)
+          const isCurrentlyHappy = detections.some((face) => {
+            const { expression, probability } = face.expressions.asSortedArray()[0]
+
+            return expression === 'happy' && probability > 0.3
+          })
+
+          setIsHappy(isCurrentlyHappy)
           const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
           canvasRef.current.getContext('2d')!.clearRect(0, 0, videoWidth, videoHeight);
@@ -79,39 +88,68 @@ function App() {
       videoRef.current.pause();
       (videoRef.current.srcObject as MediaStream)!.getTracks()[0].stop();
       setCaptureVideo(false);
+      setHasCaptureData(false);
     }
   }
 
   return (
-    <div>
-      <div style={{ textAlign: 'center', padding: '10px' }}>
+    <>
+      <div style={{
+        position: 'absolute',
+        top: '1em',
+        left: '50%',
+        zIndex: 1,
+        transform: 'translateX(-50%)'
+      }}>
+        {hasCameraData
+          ?
+          <button onClick={closeWebcam} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
+            <FeatherIcon icon="eye" />
+          </button>
+          :
+          <button style={{ cursor: 'default', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
+            <FeatherIcon icon="eye-off" />
+          </button>}
+      </div>
+
+      <div style={{
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100dvw',
+        height: '100dvh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
         {
-          captureVideo && modelsLoaded ?
-            <button onClick={closeWebcam} style={{ cursor: 'pointer', backgroundColor: 'green', color: 'white', padding: '15px', fontSize: '25px', border: 'none', borderRadius: '10px' }}>
-              Close Webcam
-            </button>
+          captureVideo ?
+            modelsLoaded ?
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
+                  <video ref={videoRef} height={videoHeight} width={videoWidth} onPlay={handleVideoOnPlay} style={{ borderRadius: '10px' }} />
+                  <canvas ref={canvasRef} style={{ position: 'absolute' }} />
+                </div>
+              </div>
+              :
+              <div>loading...</div>
             :
-            <button onClick={startVideo} style={{ cursor: 'pointer', backgroundColor: 'green', color: 'white', padding: '15px', fontSize: '25px', border: 'none', borderRadius: '10px' }}>
-              Open Webcam
+            <button onClick={startVideo} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
+              <FeatherIcon icon="play" fill='#333' size={36} color="#333" />
             </button>
         }
       </div>
-      {
-        captureVideo ?
-          modelsLoaded ?
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
-                <video ref={videoRef} height={videoHeight} width={videoWidth} onPlay={handleVideoOnPlay} style={{ borderRadius: '10px' }} />
-                <canvas ref={canvasRef} style={{ position: 'absolute' }} />
-              </div>
-            </div>
-            :
-            <div>loading...</div>
-          :
-          <>
-          </>
-      }
-    </div>
+
+      <div style={{
+        position: 'absolute',
+        bottom: '1em',
+        left: '50%',
+        zIndex: 1,
+        transform: 'translateX(-50%)'
+      }}>
+        {isHappy && <FeatherIcon icon='smile' />}
+      </div>
+    </>
   );
 }
 
