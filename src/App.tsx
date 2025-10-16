@@ -19,8 +19,6 @@ function App() {
 
       Promise.all([
         faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
         faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
       ]).then(() => setModelsLoaded(true));
     }
@@ -52,8 +50,8 @@ function App() {
         if (canvasRef.current && videoRef.current) {
           setHasCaptureData(true)
           const newCanvas = faceapi.createCanvasFromMedia(videoRef.current);
-          canvasRef.current.innerHTML = ''; // clear existing content if needed
-          canvasRef.current.appendChild(newCanvas); // ✅ append the face-api canvas
+          canvasRef.current.innerHTML = '';
+          canvasRef.current.appendChild(newCanvas);
 
           faceapi.matchDimensions(canvasRef.current, displaySize);
         }
@@ -62,7 +60,9 @@ function App() {
       setInterval(async () => {
         if (canvasRef.current && videoRef.current) {
 
-          const detections = await faceapi.detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
+          const detections = await faceapi
+            .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
+            .withFaceExpressions();
 
           const isCurrentlyHappy = detections.some((face) => {
             const { expression, probability } = face.expressions.asSortedArray()[0]
@@ -74,8 +74,6 @@ function App() {
           const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
           canvasRef.current.getContext('2d')!.clearRect(0, 0, videoWidth, videoHeight);
-          faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
-          faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
           faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
 
         }
