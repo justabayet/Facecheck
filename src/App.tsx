@@ -15,6 +15,10 @@ function App() {
   const videoWidth = 640;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+
+  const params = new URLSearchParams(window.location.search);
+  const debug = params.has("debug");
+
   useEffect(() => {
     const loadModels = async () => {
       const MODEL_URL = '/models';
@@ -76,7 +80,7 @@ function App() {
           const resizedDetections = faceapi.resizeResults(detections, displaySize);
 
           canvasRef.current.getContext('2d')!.clearRect(0, 0, videoWidth, videoHeight);
-          faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
+          if (debug) faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
 
         }
       }, 100)
@@ -104,7 +108,6 @@ function App() {
         {hasCameraData
           ?
           <button onClick={closeWebcam} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
-            {/* <FeatherIcon icon="eye" /> */}
             <Eye size={32} />
           </button>
           :
@@ -127,7 +130,7 @@ function App() {
           captureVideo ?
             modelsLoaded ?
               <div>
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '10px', visibility: debug ? 'visible' : 'hidden' }}>
                   <video ref={videoRef} height={videoHeight} width={videoWidth} onPlay={handleVideoOnPlay} style={{ borderRadius: '10px' }} />
                   <canvas ref={canvasRef} style={{ position: 'absolute' }} />
                 </div>
@@ -136,20 +139,21 @@ function App() {
               <div>loading...</div>
             :
             <button onClick={startVideo} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
-              <FeatherIcon icon="play" fill='#333' size={36} color="#333" />
+              <FeatherIcon icon="play" fill='#333' size={128} color="#333" />
             </button>
         }
       </div>
 
-      <div style={{
-        position: 'absolute',
-        bottom: '1em',
-        left: '50%',
-        zIndex: 1,
-        transform: 'translateX(-50%)'
-      }} className={`smile ${isHappy ? 'show' : 'hide'}`}>
-        <FeatherIcon icon='smile' />
-      </div>
+      {hasCameraData &&
+        <div style={{
+          position: 'absolute',
+          bottom: debug ? '1em' : '50%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1
+        }} className={`smile ${isHappy ? 'show' : 'hide'}`}>
+          <FeatherIcon icon='smile' size={debug ? 32 : 128} />
+        </div>}
     </>
   );
 }
