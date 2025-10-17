@@ -1,0 +1,27 @@
+svg {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 2;
+}
+
+
+.pupil {
+    transform-origin: center;
+    animation: lookAround 4s ease-in-out infinite;
+}
+
+@keyframes lookAround {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(20%);
+    }
+
+    75% {
+        transform: translateX(-20%);
+    }
+}

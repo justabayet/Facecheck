@@ -1,6 +1,7 @@
 import * as faceapi from 'face-api.js';
 import { useEffect, useRef, useState } from 'react';
 import FeatherIcon from "feather-icons-react";
+import Eye from './Components/Eye';
 
 function App() {
   const [modelsLoaded, setModelsLoaded] = useState(false);
@@ -102,7 +103,8 @@ function App() {
         {hasCameraData
           ?
           <button onClick={closeWebcam} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
-            <FeatherIcon icon="eye" />
+            {/* <FeatherIcon icon="eye" /> */}
+            <Eye />
           </button>
           :
           <button style={{ cursor: 'default', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
