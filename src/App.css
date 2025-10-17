@@ -4,3 +4,23 @@
   padding: 2rem;
   text-align: center;
 }
+
+.smile {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  /* Smooth fade-out by default */
+}
+
+/* When visible = true */
+.smile.show {
+  opacity: 1;
+  transition: none;
+  /* Appear instantly */
+}
+
+/* When visible = false */
+.smile.hide {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  /* Fade out slowly */
+}

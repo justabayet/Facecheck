@@ -2,6 +2,7 @@ import * as faceapi from 'face-api.js';
 import { useEffect, useRef, useState } from 'react';
 import FeatherIcon from "feather-icons-react";
 import Eye from './Components/Eye';
+import './App.css';
 
 function App() {
   const [modelsLoaded, setModelsLoaded] = useState(false);
@@ -146,8 +147,8 @@ function App() {
         left: '50%',
         zIndex: 1,
         transform: 'translateX(-50%)'
-      }}>
-        {isHappy && <FeatherIcon icon='smile' />}
+      }} className={`smile ${isHappy ? 'show' : 'hide'}`}>
+        <FeatherIcon icon='smile' />
       </div>
     </>
   );
