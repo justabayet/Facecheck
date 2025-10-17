@@ -104,11 +104,11 @@ function App() {
           ?
           <button onClick={closeWebcam} style={{ cursor: 'pointer', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
             {/* <FeatherIcon icon="eye" /> */}
-            <Eye />
+            <Eye size={32} />
           </button>
           :
           <button style={{ cursor: 'default', backgroundColor: 'transparent', padding: '15px', border: 'none', borderRadius: '50%' }}>
-            <FeatherIcon icon="eye-off" />
+            <FeatherIcon icon="eye-off" size={32} />
           </button>}
       </div>
 
